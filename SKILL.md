@@ -6,14 +6,16 @@ description: |
   into -Delete/ and -Backup/ folders at the workspace root, each with a manifest
   for audit and restore. Keep dependency installs inside the project (venv,
   node_modules) and ledger anything that leaked into global environments with
-  uninstall commands. Use when finishing any task that created scratch files,
-  before committing, when the user mentions cleaning up, tidying, junk, temp
-  files, a messy project, environment pollution, global installs, or venvs, or
-  whenever you notice litter you created piling up — including leftover dev
-  servers and processes you started — even if the user did not ask.
+  uninstall commands. Keep secrets (keys, cookies, tokens) from leaving the
+  machine and keep shareable files free of absolute paths. Use when finishing
+  any task that created scratch files, before committing or pushing, when the
+  user mentions cleaning up, tidying, junk, temp files, a messy project,
+  environment pollution, global installs, open-sourcing, or venvs, or whenever
+  you notice litter you created piling up — including leftover dev servers and
+  processes you started — even if the user did not ask.
 license: MIT
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Litterbox: move, never delete
@@ -71,9 +73,20 @@ A missing runtime (Python on a machine that has none, Node, a compiler) cannot a
 
 `.venv/`, `node_modules/`, `__pycache__/`, `dist/`, `build/`, tool caches: too big to move, rebuilt from manifest files. Never archive them into the buckets. Instead: (1) confirm the lockfile or requirements file exists so they are truly regenerable, (2) add the matching `.gitignore` entry if missing, (3) report them with sizes as "regenerable — safe to wipe" and let the human decide. Wipe only when the user asks; a permission failure goes to the report, not to a force-flag retry.
 
-## Secrets check
+## Secrets: never leave the machine
 
-Debug dumps, `.env` copies, and log files often contain tokens — `sk-…`, `ghp_…`, connection strings, passwords. Before archiving such a file, scan it. If it holds secrets, mark the manifest line `CONTAINS SECRETS — empty bucket soon` and say so in the report. Never reproduce the secret values in the report.
+Debug dumps, `.env` copies, and log files often contain tokens — `sk-…` API keys, `ghp_…` GitHub tokens, `Cookie:` / session strings, `AKIA…` AWS keys, JWTs (`eyJ…`), `-----BEGIN … PRIVATE KEY-----` blocks, connection strings with passwords. Before archiving such a file, scan it. If it holds secrets, mark the manifest line `CONTAINS SECRETS — empty bucket soon` and say so in the report. Never reproduce the secret values in the report.
+
+The scan matters most at the **publish boundary** — the moment content leaves the machine:
+
+- **Before every commit that will be pushed**, scan the staged diff for token patterns, cookie strings, private-key blocks, and passwords. A scan before `git push` is part of the sweep, not paranoia.
+- `.env` is gitignored, always. What ships is `.env.example` with placeholder values (`API_KEY=your-key-here`), never the real ones.
+- Secrets live in the environment or a local untracked file, never hardcoded in example code, README quickstarts, or test fixtures.
+- **If a secret did get committed and pushed, treat it as burned.** Say it plainly: deleting the file afterwards does not help — history, forks, and scrapers keep it. Rotate/revoke the credential; that is the fix. Do not offer "I removed it from the repo" as if that solved anything.
+
+## No absolute paths in anything that might leave the machine
+
+`F:\Code\...`, `/Users/alice/...` — absolute paths leak the machine's layout, break on every other machine, and often leak usernames. In anything that could be published or shared — README, docs, examples, test fixtures, config samples, scripts meant for reuse — use paths relative to the project root or placeholders: `./data/seed.csv`, `${PROJECT_ROOT}/config.yaml`, `~`. Absolute paths are acceptable only in genuinely machine-bound files that stay local (a log, an untracked local config). When you catch an absolute path in a shareable file, replace it before the sweep ends — and if the script genuinely needs a machine-specific location, read it from an environment variable or a config file the user fills in.
 
 ## How to clean up
 
@@ -115,7 +128,7 @@ Sessions also leave *running* things behind: the dev server on :8000, the test d
 
 ## Anti-patterns
 
-Numbered strongest first. §1, §4, and §6 justify stopping yourself on a single sighting.
+Numbered strongest first. §1, §4, §6, and §7 justify stopping yourself on a single sighting.
 
 ### §1. The brave delete
 
@@ -170,6 +183,15 @@ Numbered strongest first. §1, §4, and §6 justify stopping yourself on a singl
 > pip install httpie — ok, tool installed, moving on.
 **After:**
 > Created .venv, added httpie to requirements.txt, installed locally. (Missing runtime? Detect, conflict-check, offer the choice — see *Runtimes* above. Ledger anything that does go global.)
+
+### §7. The published secret
+
+**Watch for:** `git add -A && git push` with a `.env` or config holding live credentials; hardcoded `api_key="sk-…"` in example code; a real token pasted into a README quickstart; "I pushed it by mistake but deleted the file right away"; a cookie string copied from the browser into a debug script that gets committed.
+**Problem:** A pushed secret is a burned secret. Deletion, force-push, and "it was only up for a minute" do not help — history, forks, and automated scrapers that watch new commits keep it. The fix is rotation, and the cost is downtime plus someone's quota.
+**Before:**
+> git add -A && git push  *(config.js still holds the live API key)*
+**After:**
+> Scanned the staged diff — caught the key. It moved to `.env` (gitignored), code reads `process.env.API_KEY`, README ships `.env.example` with a placeholder. Ready to push.
 
 ## Restore
 

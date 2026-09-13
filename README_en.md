@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/license-MIT-3fb950?style=flat-square" alt="license MIT">
   <img src="https://img.shields.io/badge/type-agent%20skill-2f81f7?style=flat-square" alt="type agent skill">
   <img src="https://img.shields.io/badge/core-one%20SKILL.md-f0883e?style=flat-square" alt="core: one SKILL.md">
-  <img src="https://img.shields.io/badge/version-1.3.0-a371f7?style=flat-square" alt="version 1.3.0">
+  <img src="https://img.shields.io/badge/version-1.4.0-a371f7?style=flat-square" alt="version 1.4.0">
   <img src="https://img.shields.io/badge/PRs-welcome-3fb950?style=flat-square" alt="PRs welcome">
 </p>
 
@@ -30,7 +30,7 @@ Litterbox is a workspace-hygiene skill that gives the agent a fixed routine:
 2. **Backup before overwrite** — any time the agent replaces an existing file, the original is snapshotted into **`-Backup/<timestamp>/<original-path>/`** first. Old versions are always recoverable.
 3. **Every move is logged** — each bucket has a `MANIFEST.md`: original path, destination, reason, and permission failures marked "needs manual deletion".
 4. **Packages stay in the project; runtimes ask first** — `.venv` / the project's `package.json` before installing any package. A missing runtime (Python, Node) triggers detect → conflict-check → your call: project-local (recommended) or global; a conflict forces project-local. Anything that does go global is ledgered with an uninstall command.
-5. **Secrets get flagged** — debug dumps often contain API keys; the agent scans before archiving and marks the manifest `CONTAINS SECRETS` so you empty that bucket first.
+5. **Secrets never leave the machine** — dumps are scanned before archiving (`CONTAINS SECRETS`), and the staged diff is scanned again before every push; a credential that did get pushed is treated as burned — rotate first.
 6. **Restore is one copy command** — the manifest records the original path. No tooling, no lock-in.
 
 The leading dash keeps both folders **sorted above everything else** in your file browser — the first thing you see is exactly how much litter the agent left this time.
@@ -49,6 +49,8 @@ The leading dash keeps both folders **sorted above everything else** in your fil
 | Restore `cp`s over work done after the backup | Destination checked first; changed files are snapshotted before restore |
 | Dev server or test container still running after the task | Sweep reports "still running" + stop commands; stops only when asked |
 | A half-failed move still lands in the manifest as success | Moves are verified before logging; buckets are always gitignored |
+| Open-sourcing pushes a key or cookie into history forever | Publish-boundary scan on the staged diff; `.env` always gitignored, examples ship `.env.example` placeholders |
+| README and examples hardcode `F:\Code\...` paths nobody else has | Shareable files use relative paths or placeholders; absolute paths only in machine-local files |
 | `.venv` / `node_modules` archived or wiped carelessly | Regenerables are never archived: lockfile confirmed, sizes reported, you decide |
 | API keys inside debug dumps ride along into the bucket | Secrets scan before archiving; manifest marked `CONTAINS SECRETS` |
 
