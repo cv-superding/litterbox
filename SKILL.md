@@ -12,7 +12,7 @@ description: |
   whenever you notice litter you created piling up — even if the user did not ask.
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Litterbox: move, never delete
@@ -37,15 +37,30 @@ Backups happen **at edit time, not cleanup time**. Before an Edit/Write replaces
 
 ## Environments: install inside the project
 
-Dependency installs are the most persistent litter an agent produces — they outlive every file in the workspace and pollute a machine the agent does not own.
+Dependency installs are the most persistent litter an agent produces — they outlive every file in the workspace and pollute a machine the agent does not own. But not everything is a dependency: sometimes the runtime itself (Python, Node, a build toolchain) is missing. The two cases follow different rules.
 
-1. **Create or use a project-local environment before installing anything.** Python: `python -m venv .venv` at the workspace root, then install into it. Node: install against the project's own `package.json` so packages land in its `node_modules/`. Never `pip install --user`, never `npm install -g`, never install into the interpreter or prefix you happened to find on the machine.
+### Packages: always project-local
+
+1. **Create or use a project-local environment before installing any package.** Python: `python -m venv .venv` at the workspace root, then install into it. Node: install against the project's own `package.json` so packages land in its `node_modules/`. Never `pip install --user`, never `npm install -g`, never install into the interpreter or prefix you happened to find on the machine.
 
 2. **Write the project's dependency manifest before installing.** Create `requirements.txt` / update `package.json` first, then install — the environment stays reproducible and can be deleted without losing information. An installed-but-unrecorded dependency is a landmine for the next person.
 
 3. **If a normal local install is impossible** (read-only workspace, permission walls), fall back to `pip install --target ./.deps` — still inside the project, still one removable folder — and note the required `PYTHONPATH` in the report.
 
-4. **Ledger anything that reached a global or shared location** — including installs a previous session already made that you notice. Append to the `-Delete/MANIFEST.md` under "installed outside the project": package, version, and the exact uninstall command (`pip uninstall -y httpie`). The human runs it or doesn't; the point is the machine's state is no longer undocumented.
+### Runtimes: detect, offer the choice, conflict-check
+
+A missing runtime (Python on a machine that has none, Node, a compiler) cannot always live inside the project — and unlike a package, a wrong runtime install breaks other people's work too. So:
+
+1. **Detect before proposing.** Check what already exists: `python` / `python3` / `py` and their versions, `node`, plus version managers (`pyenv`, `nvm`, `conda`, `asdf`) that own those names. A "missing Python" that is really a PATH-shadowed Python is a configuration fix, not an install.
+
+2. **Offer the user the choice — one question, with your recommendation:**
+   - **Project-local** (default recommendation): a portable/standalone runtime or version-managed environment inside or beside the workspace. Nothing on the machine changes; deleting the project removes it.
+   - **Global** (system installer / package manager): for runtimes the user wants to reuse outside this project. Proceed only on an explicit yes.
+   Do not proceed on silence. "It's the obvious choice" is not consent — it is exactly the guess this skill exists to stop.
+
+3. **Conflict-check before any global install; if a conflict exists, project-local is the only option.** Look for: an existing runtime of the same name on PATH (a version a global install would shadow or upgrade), a version manager that owns the name, an ecosystem pinned to the current version. State what you found; when a conflict exists, say "global would conflict — installing project-locally" and do that. Two Pythons fighting over `python` is a machine-level bug you must not introduce.
+
+4. **Ledger a global runtime install** like any other machine change: what, where, and the uninstall command.
 
 ## Regenerables: never archive, always record
 
@@ -134,12 +149,12 @@ Numbered strongest first. §1, §4, and §6 justify stopping yourself on a singl
 
 ### §6. The global install
 
-**Watch for:** `pip install` into the system or user interpreter; `npm install -g`; installing into conda base; installing anything without a `requirements.txt` / `package.json` entry; treating a machine-level environment as personal scratch space.
+**Watch for:** `pip install` into the system or user interpreter; `npm install -g`; installing into conda base; installing anything without a `requirements.txt` / `package.json` entry; treating a machine-level environment as personal scratch space; installing a missing runtime globally without checking what already owns that name.
 **Problem:** This litter is invisible and outlives everything. The next project inherits your experiment; the machine's Python is now state nobody documented; the "temporary" tool stays forever because nobody remembers installing it.
 **Before:**
 > pip install httpie — ok, tool installed, moving on.
 **After:**
-> Created .venv, added httpie to requirements.txt, installed locally. (If global was unavoidable: ledgered `pip uninstall -y httpie` in the manifest.)
+> Created .venv, added httpie to requirements.txt, installed locally. (Missing runtime? Detect, conflict-check, offer the choice — see *Runtimes* above. Ledger anything that does go global.)
 
 ## Restore
 
