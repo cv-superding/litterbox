@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/license-MIT-3fb950?style=flat-square" alt="license MIT">
   <img src="https://img.shields.io/badge/type-agent%20skill-2f81f7?style=flat-square" alt="type agent skill">
   <img src="https://img.shields.io/badge/core-one%20SKILL.md-f0883e?style=flat-square" alt="core: one SKILL.md">
-  <img src="https://img.shields.io/badge/version-1.0.0-a371f7?style=flat-square" alt="version 1.0.0">
+  <img src="https://img.shields.io/badge/version-1.1.0-a371f7?style=flat-square" alt="version 1.1.0">
   <img src="https://img.shields.io/badge/PRs-welcome-3fb950?style=flat-square" alt="PRs welcome">
 </p>
 
@@ -29,7 +29,9 @@ litterbox 是一个工作区卫生技能，教 agent 一套固定流程：
 1. **只搬不删** —— 移动几乎总有权限，删除未必。垃圾全部归拢到工作区根目录的 **`-Delete/`**，你扫一眼 manifest 再决定清空。
 2. **覆盖前先备份** —— 凡是要改写已有文件，先把原版快照进 **`-Backup/时间戳/原相对路径/`**，旧版本永远找得回来。
 3. **每次移动都记账** —— 两个桶里各有一份 `MANIFEST.md`：原路径、去向、原因、失败原因（权限不够的标记"需人工删除"）。
-4. **还原是一行命令** —— manifest 记了原路径，`cp` 回去就行，没有任何锁定。
+4. **依赖只进项目环境** —— 装依赖前先建 `.venv`/用项目 `package.json`，绝不碰全局环境；万一装进了全局（或发现上个会话的遗留），账本里登记包名和**卸载命令**。
+5. **泄密垃圾单独标记** —— debug dump 里常藏着 API key，归档前先扫描，账本标 `CONTAINS SECRETS` 提醒你优先清空。
+6. **还原是一行命令** —— manifest 记了原路径，`cp` 回去就行，没有任何锁定。
 
 `-Delete` 和 `-Backup` 开头的短横线让它们在文件管理器里**永远排在最上面**——你第一眼就能看到 agent 这次拉了多少。
 
@@ -42,6 +44,9 @@ litterbox 是一个工作区卫生技能，教 agent 一套固定流程：
 | 直接覆写 `config.yaml`，旧版本原地蒸发 | 改写前先快照到 `-Backup/时间戳/` |
 | 看到 `legacy_export.py` 名字可疑就搬走，构建炸了 | 搬前先 grep 引用；被引用的一律不动并在报告里说明 |
 | 垃圾桶本身变成第二个垃圾堆 | 每次移动必记 manifest，可审计可还原 |
+| `pip install` 直接装进系统环境，无据可查 | 先建 `.venv`/项目清单再装；全局泄漏登记包名 + 卸载命令 |
+| `.venv`/`node_modules` 被当垃圾乱搬乱删 | 可再生目录永不归档：确认 lockfile 存在、报大小、由你决定 |
+| debug dump 里的 API key 跟着垃圾进桶 | 归档前扫描密钥，账本标记 `CONTAINS SECRETS` |
 
 完整纪律（分类规则、永不触碰清单、五种反模式的 Before/After）见 [`SKILL.md`](SKILL.md)。
 

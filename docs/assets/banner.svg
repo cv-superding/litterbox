@@ -44,8 +44,8 @@
     <text x="610" y="223" text-anchor="middle" fill="#f0dfb8">manifest every move</text>
     <rect x="732" y="200" width="152" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
     <text x="808" y="223" text-anchor="middle" fill="#f0dfb8">restore anytime</text>
-    <rect x="898" y="200" width="120" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
-    <text x="958" y="223" text-anchor="middle" fill="#f0dfb8">zero deps</text>
+    <rect x="898" y="200" width="190" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="993" y="223" text-anchor="middle" fill="#f0dfb8">installs stay local</text>
   </g>
 
   <text x="58" y="272" font-family="Consolas, Menlo, monospace" font-size="15" fill="#a08c60">agent skill · MIT · works with Claude Code / Codex / Cursor / Gemini CLI / OpenCode</text>

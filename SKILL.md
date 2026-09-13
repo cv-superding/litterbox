@@ -4,13 +4,15 @@ description: |
   Workspace hygiene for coding agents: classify AI-generated junk files and old
   file versions, then MOVE them — never delete, you may not have permission —
   into -Delete/ and -Backup/ folders at the workspace root, each with a manifest
-  for audit and restore. Use when finishing any task that created scratch files,
+  for audit and restore. Keep dependency installs inside the project (venv,
+  node_modules) and ledger anything that leaked into global environments with
+  uninstall commands. Use when finishing any task that created scratch files,
   before committing, when the user mentions cleaning up, tidying, junk, temp
-  files, or a messy project, or whenever you notice litter you created piling up —
-  even if the user did not ask.
+  files, a messy project, environment pollution, global installs, or venvs, or
+  whenever you notice litter you created piling up — even if the user did not ask.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Litterbox: move, never delete
@@ -33,6 +35,26 @@ The leading dash sorts both folders above every normal folder, so the human sees
 
 Backups happen **at edit time, not cleanup time**. Before an Edit/Write replaces an existing file you did not create in this session, copy the original into `-Backup/<timestamp>/<original-relative-path>` first. Once you have overwritten it, the old version is gone — a cleanup pass cannot bring it back.
 
+## Environments: install inside the project
+
+Dependency installs are the most persistent litter an agent produces — they outlive every file in the workspace and pollute a machine the agent does not own.
+
+1. **Create or use a project-local environment before installing anything.** Python: `python -m venv .venv` at the workspace root, then install into it. Node: install against the project's own `package.json` so packages land in its `node_modules/`. Never `pip install --user`, never `npm install -g`, never install into the interpreter or prefix you happened to find on the machine.
+
+2. **Write the project's dependency manifest before installing.** Create `requirements.txt` / update `package.json` first, then install — the environment stays reproducible and can be deleted without losing information. An installed-but-unrecorded dependency is a landmine for the next person.
+
+3. **If a normal local install is impossible** (read-only workspace, permission walls), fall back to `pip install --target ./.deps` — still inside the project, still one removable folder — and note the required `PYTHONPATH` in the report.
+
+4. **Ledger anything that reached a global or shared location** — including installs a previous session already made that you notice. Append to the `-Delete/MANIFEST.md` under "installed outside the project": package, version, and the exact uninstall command (`pip uninstall -y httpie`). The human runs it or doesn't; the point is the machine's state is no longer undocumented.
+
+## Regenerables: never archive, always record
+
+`.venv/`, `node_modules/`, `__pycache__/`, `dist/`, `build/`, tool caches: too big to move, rebuilt from manifest files. Never archive them into the buckets. Instead: (1) confirm the lockfile or requirements file exists so they are truly regenerable, (2) add the matching `.gitignore` entry if missing, (3) report them with sizes as "regenerable — safe to wipe" and let the human decide. Wipe only when the user asks; a permission failure goes to the report, not to a force-flag retry.
+
+## Secrets check
+
+Debug dumps, `.env` copies, and log files often contain tokens — `sk-…`, `ghp_…`, connection strings, passwords. Before archiving such a file, scan it. If it holds secrets, mark the manifest line `CONTAINS SECRETS — empty bucket soon` and say so in the report. Never reproduce the secret values in the report.
+
 ## How to clean up
 
 1. **Inventory your own litter first.** You know what you created this session — that is the highest-confidence list, and none of it needs a reference check. Everything else is a candidate that needs one.
@@ -49,6 +71,8 @@ Backups happen **at edit time, not cleanup time**. Before an Edit/Write replaces
    - `output_v1.json`, `output_final.json` → -Delete/ — superseded experiment outputs
    - `src/config.yaml` → -Backup/2026-09-13_1542/ — original before override edit
    - `/etc/nginx/conf.d/app.conf` — MOVE FAILED: permission denied — **needs manual deletion**
+   - `debug_env.txt` — **CONTAINS SECRETS** (1 token pattern) — empty bucket soon
+   - installed outside the project: `httpie 3.1.3` — `pip uninstall -y httpie` — **needs manual uninstall**
    ```
 
 5. **Report in this order: archived → backed up → needs manual deletion → left alone (and why).** Short table, no narration.
@@ -57,11 +81,11 @@ Shell tip: a leading dash confuses argument parsing. Use `./`: `mv scratch_test.
 
 ## Never move
 
-`.git/` and other VCS internals · agent/tool config dirs (`.claude/`, `.cursor/`, `.agents/`) · `node_modules/`, `venv/`, `__pycache__/` · lockfiles (`package-lock.json`, `uv.lock`, `poetry.lock`) · `LICENSE`, `README.md`, CI workflows · anything outside the workspace root · anything the user recently changed by hand. When in doubt: leave it, list it in the report as "left alone (why)".
+`.git/` and other VCS internals · agent/tool config dirs (`.claude/`, `.cursor/`, `.agents/`) · `node_modules/`, `venv/`, `__pycache__/` and other regenerables (record, don't archive) · lockfiles (`package-lock.json`, `uv.lock`, `poetry.lock`) · `LICENSE`, `README.md`, CI workflows · shared caches outside the workspace (`~/.cache`, pip/npm caches — the machine shares them) · anything outside the workspace root — except litter you created there yourself this session (a stray download in `~/Downloads`), which you may move into `-Delete/` if permitted, else report the path · anything the user recently changed by hand. When in doubt: leave it, list it in the report as "left alone (why)".
 
 ## Anti-patterns
 
-Numbered strongest first. §1 and §4 justify stopping yourself on a single sighting.
+Numbered strongest first. §1, §4, and §6 justify stopping yourself on a single sighting.
 
 ### §1. The brave delete
 
@@ -108,13 +132,22 @@ Numbered strongest first. §1 and §4 justify stopping yourself on a single sigh
 **After:**
 > All cleaned up — MANIFEST.md lists each file, its origin, and the reason; restore is one copy per line.
 
+### §6. The global install
+
+**Watch for:** `pip install` into the system or user interpreter; `npm install -g`; installing into conda base; installing anything without a `requirements.txt` / `package.json` entry; treating a machine-level environment as personal scratch space.
+**Problem:** This litter is invisible and outlives everything. The next project inherits your experiment; the machine's Python is now state nobody documented; the "temporary" tool stays forever because nobody remembers installing it.
+**Before:**
+> pip install httpie — ok, tool installed, moving on.
+**After:**
+> Created .venv, added httpie to requirements.txt, installed locally. (If global was unavoidable: ledgered `pip uninstall -y httpie` in the manifest.)
+
 ## Restore
 
 Read `MANIFEST.md`, copy back: `cp -r "./-Backup/2026-09-13_1542/src/config.yaml" src/config.yaml`. For `-Delete/`, the manifest's original path is the destination. Restore is a normal file operation — no special tooling, no lock-in.
 
 ## What to return
 
-**End-of-task sweep (default).** A short table: archived to -Delete (count + notable names) · backed up to -Backup (count + what was snapshotted) · needs manual deletion (paths, permission errors) · left alone (names + one-line why). Nothing else.
+**End-of-task sweep (default).** A short table: archived to -Delete (count + notable names) · backed up to -Backup (count + what was snapshotted) · installed outside the project (packages + uninstall commands) · regenerable and safe to wipe (names + sizes) · needs manual deletion (paths, permission errors) · left alone (names + one-line why). Nothing else.
 
 **User asks for a restore.** The manifest lines matching their description, the exact copy commands, and a confirmation of what was restored.
 
