@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/license-MIT-3fb950?style=flat-square" alt="license MIT">
   <img src="https://img.shields.io/badge/type-agent%20skill-2f81f7?style=flat-square" alt="type agent skill">
   <img src="https://img.shields.io/badge/core-one%20SKILL.md-f0883e?style=flat-square" alt="core: one SKILL.md">
-  <img src="https://img.shields.io/badge/version-1.2.0-a371f7?style=flat-square" alt="version 1.2.0">
+  <img src="https://img.shields.io/badge/version-1.3.0-a371f7?style=flat-square" alt="version 1.3.0">
   <img src="https://img.shields.io/badge/PRs-welcome-3fb950?style=flat-square" alt="PRs welcome">
 </p>
 
@@ -46,6 +46,9 @@ The leading dash keeps both folders **sorted above everything else** in your fil
 | The bucket itself becomes a second junk drawer | Every move appends a manifest line — auditable, restorable |
 | `pip install` straight into the system environment, untraceable | `.venv` / project manifest first; global leaks get ledgered with uninstall commands |
 | Python/Node missing → silent global install that breaks someone else's setup | Detect existing versions, managers, and conflicts first; then your call: project-local (recommended) or global — conflicts force local |
+| Restore `cp`s over work done after the backup | Destination checked first; changed files are snapshotted before restore |
+| Dev server or test container still running after the task | Sweep reports "still running" + stop commands; stops only when asked |
+| A half-failed move still lands in the manifest as success | Moves are verified before logging; buckets are always gitignored |
 | `.venv` / `node_modules` archived or wiped carelessly | Regenerables are never archived: lockfile confirmed, sizes reported, you decide |
 | API keys inside debug dumps ride along into the bucket | Secrets scan before archiving; manifest marked `CONTAINS SECRETS` |
 

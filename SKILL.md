@@ -9,10 +9,11 @@ description: |
   uninstall commands. Use when finishing any task that created scratch files,
   before committing, when the user mentions cleaning up, tidying, junk, temp
   files, a messy project, environment pollution, global installs, or venvs, or
-  whenever you notice litter you created piling up — even if the user did not ask.
+  whenever you notice litter you created piling up — including leftover dev
+  servers and processes you started — even if the user did not ask.
 license: MIT
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Litterbox: move, never delete
@@ -25,7 +26,7 @@ An agent's litter gets everywhere: scratch scripts, debug dumps, `output_final_v
 
 **`-Backup/` — old versions.** A snapshot of any existing file *before* you overwrite or replace it: edited sources, replaced configs, superseded drafts. Keep the original relative path inside a timestamp directory: `-Backup/2026-09-13_1542/src/config.yaml`.
 
-The leading dash sorts both folders above every normal folder, so the human sees them first.
+The leading dash sorts both folders above every normal folder, so the human sees them first. If the workspace root is read-only, fall back to the nearest writable ancestor directory or `~/.litterbox/<project-name>/` — and say where the buckets ended up in the report. If the user prefers different bucket names, follow their names.
 
 ## The one rule
 
@@ -34,6 +35,10 @@ The leading dash sorts both folders above every normal folder, so the human sees
 ## The backup habit
 
 Backups happen **at edit time, not cleanup time**. Before an Edit/Write replaces an existing file you did not create in this session, copy the original into `-Backup/<timestamp>/<original-relative-path>` first. Once you have overwritten it, the old version is gone — a cleanup pass cannot bring it back.
+
+## Create litter in one place
+
+The cheapest cleanup is the one that needs no archaeology. From the first minute of a task, put every throwaway artifact — scratch scripts, experiment outputs, debug dumps — into one scratch folder (`./tmp/`, or the project's existing convention), never into `src/` or the root. Files born in the scratch folder are pre-classified: at sweep time the whole folder is yours, so it moves into `-Delete/` wholesale with no reference checks. Litter that never scattered is the only kind this skill handles perfectly.
 
 ## Environments: install inside the project
 
@@ -78,7 +83,7 @@ Debug dumps, `.env` copies, and log files often contain tokens — `sk-…`, `gh
 
 3. **Reference-check anything you did not create.** Search the workspace for the basename (imports, config keys, path strings, docs) before moving it. If it is referenced: leave it alone. "Looks unused" is not evidence — a file named `legacy_export.py` may be load-bearing.
 
-4. **Move, then manifest.** Append one line per file to `MANIFEST.md` inside the bucket:
+4. **Move, verify, then manifest.** A move is complete only when the destination exists and the origin is gone — check both before writing anything. A directory move that dies halfway (permission errors, a locked file on Windows) must be finished or rolled back, never reported as done. Then remove parent directories the litter left empty — only ones created this session. Append one line per file to `MANIFEST.md` inside the bucket:
 
    ```markdown
    ## 2026-09-13 15:42
@@ -93,6 +98,16 @@ Debug dumps, `.env` copies, and log files often contain tokens — `sk-…`, `gh
 5. **Report in this order: archived → backed up → needs manual deletion → left alone (and why).** Short table, no narration.
 
 Shell tip: a leading dash confuses argument parsing. Use `./`: `mv scratch_test.py ./-Delete/`.
+
+Another session is active in the same workspace? Sweep only your own session's litter and leave everything else — you cannot see the other agent's in-flight references.
+
+## Keep the buckets out of git
+
+The buckets are a local safety net, not repo assets. During a project's first sweep, make sure `.gitignore` covers `-Delete/` and `-Backup/` — add the entries if missing. Committed litter is worse than litter: it lives in history even after the folder is emptied.
+
+## Litter isn't only files
+
+Sessions also leave *running* things behind: the dev server on :8000, the test database container, a watch process. At sweep time, report what **you started** that is still running, with the command to stop it — and stop them when the user asks. Things that were already running before your session are not yours: leave them alone and don't list them.
 
 ## Never move
 
@@ -158,11 +173,15 @@ Numbered strongest first. §1, §4, and §6 justify stopping yourself on a singl
 
 ## Restore
 
-Read `MANIFEST.md`, copy back: `cp -r "./-Backup/2026-09-13_1542/src/config.yaml" src/config.yaml`. For `-Delete/`, the manifest's original path is the destination. Restore is a normal file operation — no special tooling, no lock-in.
+Read `MANIFEST.md`, copy back: `cp -r "./-Backup/2026-09-13_1542/src/config.yaml" src/config.yaml`. For `-Delete/`, the manifest's original path is the destination.
+
+**Check the destination first.** If the file has changed since the snapshot — newer edits, a newer backup, anything — snapshot the current version into `-Backup/<new-timestamp>/` before restoring, so a restore can never destroy newer work. Then verify what you restored: run it, open it, or diff it. Restore is a normal file operation — no special tooling, no lock-in.
+
+**Backup aging.** If `-Backup/` holds many snapshots of the same file, or snapshots older than a month, say so in the sweep report and suggest pruning to the newest. The human decides; you never prune on your own.
 
 ## What to return
 
-**End-of-task sweep (default).** A short table: archived to -Delete (count + notable names) · backed up to -Backup (count + what was snapshotted) · installed outside the project (packages + uninstall commands) · regenerable and safe to wipe (names + sizes) · needs manual deletion (paths, permission errors) · left alone (names + one-line why). Nothing else.
+**End-of-task sweep (default).** A short table: archived to -Delete (count + notable names) · backed up to -Backup (count + what was snapshotted) · still running (processes you started + stop commands) · installed outside the project (packages + uninstall commands) · regenerable and safe to wipe (names + sizes) · needs manual deletion (paths, permission errors) · left alone (names + one-line why). Nothing else.
 
 **User asks for a restore.** The manifest lines matching their description, the exact copy commands, and a confirmation of what was restored.
 

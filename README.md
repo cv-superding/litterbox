@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/license-MIT-3fb950?style=flat-square" alt="license MIT">
   <img src="https://img.shields.io/badge/type-agent%20skill-2f81f7?style=flat-square" alt="type agent skill">
   <img src="https://img.shields.io/badge/core-one%20SKILL.md-f0883e?style=flat-square" alt="core: one SKILL.md">
-  <img src="https://img.shields.io/badge/version-1.2.0-a371f7?style=flat-square" alt="version 1.2.0">
+  <img src="https://img.shields.io/badge/version-1.3.0-a371f7?style=flat-square" alt="version 1.3.0">
   <img src="https://img.shields.io/badge/PRs-welcome-3fb950?style=flat-square" alt="PRs welcome">
 </p>
 
@@ -46,6 +46,9 @@ litterbox 是一个工作区卫生技能，教 agent 一套固定流程：
 | 垃圾桶本身变成第二个垃圾堆 | 每次移动必记 manifest，可审计可还原 |
 | `pip install` 直接装进系统环境，无据可查 | 先建 `.venv`/项目清单再装；全局泄漏登记包名 + 卸载命令 |
 | 机器缺 Python/Node，闷头装进全局，砸了别人的环境 | 先检测已有版本/版本管理器/冲突，再让你选：项目内（推荐）或全局；有冲突只能项目内 |
+| 还原时直接 `cp` 回去，把备份之后的新修改盖掉了 | 还原前先查目标是否变过；变了先快照当前版再还原 |
+| 干完活 dev server、测试容器还挂在后台 | 收尾报告"仍在运行"+ 停止命令，你说停才停 |
+| move 一半失败，账本照样记"成功" | 移动后验证再写账本；桶永远 gitignore，不进仓库 |
 | `.venv`/`node_modules` 被当垃圾乱搬乱删 | 可再生目录永不归档：确认 lockfile 存在、报大小、由你决定 |
 | debug dump 里的 API key 跟着垃圾进桶 | 归档前扫描密钥，账本标记 `CONTAINS SECRETS` |
 
