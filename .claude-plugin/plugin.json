@@ -1,0 +1,16 @@
+{
+  "name": "litterbox",
+  "version": "1.0.0",
+  "description": "Workspace hygiene for coding agents: classify AI-generated junk and old versions, move them into -Delete/ and -Backup/ with manifests. Move, never delete.",
+  "author": {
+    "name": "moChen"
+  },
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "workspace-hygiene",
+    "claude-code",
+    "codex",
+    "cursor"
+  ]
+}

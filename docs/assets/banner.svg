@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-label="litterbox — workspace hygiene for coding agents">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1208"/>
+      <stop offset="0.55" stop-color="#211709"/>
+      <stop offset="1" stop-color="#2b1d0a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.82" cy="0.1" r="0.9">
+      <stop offset="0" stop-color="#7a5420" stop-opacity="0.5"/>
+      <stop offset="0.55" stop-color="#3a2c12" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#3a2c12" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="icon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7b733"/>
+      <stop offset="1" stop-color="#fc6a1a"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="1" y="1" width="1198" height="298" rx="24" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1198" height="298" rx="24" fill="url(#glow)"/>
+  <rect x="1.5" y="1.5" width="1197" height="297" rx="23.5" fill="none" stroke="#4a3a1e" stroke-width="1.5"/>
+
+  <!-- icon: paw print -->
+  <g>
+    <rect x="56" y="76" width="96" height="96" rx="22" fill="url(#icon)"/>
+    <g fill="#ffffff">
+      <ellipse cx="86" cy="108" rx="9" ry="12" transform="rotate(-18 86 108)"/>
+      <ellipse cx="104" cy="100" rx="9" ry="12"/>
+      <ellipse cx="122" cy="108" rx="9" ry="12" transform="rotate(18 122 108)"/>
+      <ellipse cx="104" cy="138" rx="20" ry="16"/>
+    </g>
+  </g>
+
+  <text x="190" y="130" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="54" font-weight="700" fill="#ffffff">litterbox</text>
+  <text x="192" y="172" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="22" fill="#d8c9a8">Your agent does its business anywhere. Litterbox gives it one place to go.</text>
+
+  <!-- feature chips -->
+  <g font-family="Consolas, Menlo, monospace" font-size="16">
+    <rect x="56"  y="200" width="190" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="151" y="223" text-anchor="middle" fill="#f0dfb8">move, never delete</text>
+    <rect x="260" y="200" width="228" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="374" y="223" text-anchor="middle" fill="#f0dfb8">-Backup before overwrite</text>
+    <rect x="502" y="200" width="216" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="610" y="223" text-anchor="middle" fill="#f0dfb8">manifest every move</text>
+    <rect x="732" y="200" width="152" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="808" y="223" text-anchor="middle" fill="#f0dfb8">restore anytime</text>
+    <rect x="898" y="200" width="120" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="958" y="223" text-anchor="middle" fill="#f0dfb8">zero deps</text>
+  </g>
+
+  <text x="58" y="272" font-family="Consolas, Menlo, monospace" font-size="15" fill="#a08c60">agent skill · MIT · works with Claude Code / Codex / Cursor / Gemini CLI / OpenCode</text>
+</svg>
