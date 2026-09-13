@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/banner.svg" alt="litterbox — 你的 agent 到处拉屎，litterbox 给它一个固定的猫砂盆" width="100%">
+  <img src="docs/assets/banner-ai.png" alt="litterbox — 你的 agent 到处拉屎，litterbox 给它一个固定的猫砂盆" width="100%">
 </p>
 
 <p align="center">

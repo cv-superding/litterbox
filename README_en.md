@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/banner.svg" alt="litterbox — your agent does its business anywhere. Litterbox gives it one place to go." width="100%">
+  <img src="docs/assets/banner-ai.png" alt="litterbox — your agent does its business anywhere. Litterbox gives it one place to go." width="100%">
 </p>
 
 <p align="center">
