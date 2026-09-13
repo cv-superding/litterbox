@@ -5,9 +5,9 @@
       <stop offset="0.55" stop-color="#211709"/>
       <stop offset="1" stop-color="#2b1d0a"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.82" cy="0.1" r="0.9">
-      <stop offset="0" stop-color="#7a5420" stop-opacity="0.5"/>
-      <stop offset="0.55" stop-color="#3a2c12" stop-opacity="0.12"/>
+    <radialGradient id="glow" cx="0.85" cy="0.08" r="0.9">
+      <stop offset="0" stop-color="#7a5420" stop-opacity="0.45"/>
+      <stop offset="0.55" stop-color="#3a2c12" stop-opacity="0.1"/>
       <stop offset="1" stop-color="#3a2c12" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="icon" x1="0" y1="0" x2="1" y2="1">
@@ -20,33 +20,47 @@
   <rect x="1" y="1" width="1198" height="298" rx="24" fill="url(#glow)"/>
   <rect x="1.5" y="1.5" width="1197" height="297" rx="23.5" fill="none" stroke="#4a3a1e" stroke-width="1.5"/>
 
-  <!-- icon: paw print -->
+  <!-- left column: icon + title + tagline + chips -->
   <g>
-    <rect x="56" y="76" width="96" height="96" rx="22" fill="url(#icon)"/>
+    <rect x="56" y="66" width="96" height="96" rx="22" fill="url(#icon)"/>
     <g fill="#ffffff">
-      <ellipse cx="86" cy="108" rx="9" ry="12" transform="rotate(-18 86 108)"/>
-      <ellipse cx="104" cy="100" rx="9" ry="12"/>
-      <ellipse cx="122" cy="108" rx="9" ry="12" transform="rotate(18 122 108)"/>
-      <ellipse cx="104" cy="138" rx="20" ry="16"/>
+      <ellipse cx="86" cy="98" rx="9" ry="12" transform="rotate(-18 86 98)"/>
+      <ellipse cx="104" cy="90" rx="9" ry="12"/>
+      <ellipse cx="122" cy="98" rx="9" ry="12" transform="rotate(18 122 98)"/>
+      <ellipse cx="104" cy="128" rx="20" ry="16"/>
     </g>
   </g>
 
-  <text x="190" y="130" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="54" font-weight="700" fill="#ffffff">litterbox</text>
-  <text x="192" y="172" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="22" fill="#d8c9a8">Your agent does its business anywhere. Litterbox gives it one place to go.</text>
+  <text x="182" y="118" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="50" font-weight="700" fill="#ffffff">litterbox</text>
+  <text x="184" y="152" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="20" fill="#d8c9a8">Your agent does its business anywhere.</text>
+  <text x="184" y="178" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="20" fill="#d8c9a8">Litterbox gives it one place to go.</text>
 
-  <!-- feature chips -->
-  <g font-family="Consolas, Menlo, monospace" font-size="16">
-    <rect x="56"  y="200" width="190" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
-    <text x="151" y="223" text-anchor="middle" fill="#f0dfb8">move, never delete</text>
-    <rect x="260" y="200" width="228" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
-    <text x="374" y="223" text-anchor="middle" fill="#f0dfb8">-Backup before overwrite</text>
-    <rect x="502" y="200" width="216" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
-    <text x="610" y="223" text-anchor="middle" fill="#f0dfb8">manifest every move</text>
-    <rect x="732" y="200" width="152" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
-    <text x="808" y="223" text-anchor="middle" fill="#f0dfb8">restore anytime</text>
-    <rect x="898" y="200" width="190" height="36" rx="18" fill="#33260f" stroke="#4a3a1e"/>
-    <text x="993" y="223" text-anchor="middle" fill="#f0dfb8">installs stay local</text>
+  <g font-family="Consolas, Menlo, monospace" font-size="15">
+    <rect x="56" y="206" width="170" height="34" rx="17" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="141" y="228" text-anchor="middle" fill="#f0dfb8">move, never delete</text>
+    <rect x="240" y="206" width="228" height="34" rx="17" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="354" y="228" text-anchor="middle" fill="#f0dfb8">-Backup before overwrite</text>
+
+    <rect x="56" y="250" width="216" height="34" rx="17" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="164" y="272" text-anchor="middle" fill="#f0dfb8">manifest every move</text>
+    <rect x="286" y="250" width="152" height="34" rx="17" fill="#33260f" stroke="#4a3a1e"/>
+    <text x="362" y="272" text-anchor="middle" fill="#f0dfb8">restore anytime</text>
   </g>
 
-  <text x="58" y="272" font-family="Consolas, Menlo, monospace" font-size="15" fill="#a08c60">agent skill · MIT · works with Claude Code / Codex / Cursor / Gemini CLI / OpenCode</text>
+  <!-- right column: folder tree card -->
+  <g>
+    <rect x="740" y="46" width="404" height="208" rx="16" fill="#241a0c" stroke="#4a3a1e"/>
+    <circle cx="766" cy="72" r="6" fill="#fc6a1a"/>
+    <circle cx="786" cy="72" r="6" fill="#f7b733"/>
+    <circle cx="806" cy="72" r="6" fill="#6b5a35"/>
+    <line x1="756" y1="90" x2="1128" y2="90" stroke="#4a3a1e"/>
+    <g font-family="Consolas, Menlo, monospace" font-size="15">
+      <text x="766" y="118" fill="#d8c9a8">your-project/</text>
+      <text x="766" y="142" fill="#8a7448">├─</text><text x="792" y="142" fill="#f7b733">-Delete/</text>
+      <text x="766" y="164" fill="#8a7448">│</text><text x="792" y="164" fill="#a89a78">├─ MANIFEST.md</text>
+      <text x="766" y="186" fill="#8a7448">│</text><text x="792" y="186" fill="#a89a78">└─ debug_dump.txt</text>
+      <text x="766" y="208" fill="#8a7448">└─</text><text x="792" y="208" fill="#f7b733">-Backup/</text>
+      <text x="766" y="230" fill="#8a7448">&#160;&#160;&#160;&#160;</text><text x="792" y="230" fill="#a89a78">└─ 09-13_1542/src/config.yaml</text>
+    </g>
+  </g>
 </svg>
