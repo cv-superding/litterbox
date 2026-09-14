@@ -16,7 +16,7 @@ description: |
   processes you started — even if the user did not ask.
 license: MIT
 metadata:
-  version: "1.5.0"
+  version: "1.6.0"
 ---
 
 # Litterbox: move, never delete
@@ -39,14 +39,16 @@ The leading dash sorts both folders above every normal folder, so the human sees
 
 Backups happen **at edit time, not cleanup time**. Before an Edit/Write replaces an existing file you did not create in this session, copy the original into `-Backup/<session-id>/<original-relative-path>` first. Once you have overwritten it, the old version is gone — a cleanup pass cannot bring it back.
 
-## Create litter in one place — per session
+## One folder per session
 
-The cheapest cleanup is the one that needs no archaeology. IDEs run several agent sessions over the same project, and their litter ends up tangled in one directory — nobody can tell which window made what. Prevent that at birth:
+The cheapest cleanup is the one that needs no archaeology — and the tidiest project root is one where nothing landed there by accident. IDEs run several agent sessions over the same project; without a convention, every window dumps its files into the project root and nobody can tell which session made what.
 
-- **Claim a session id at task start.** Use the harness's session id when there is one; otherwise make up a short stamp once and reuse it all session: `2026-09-14_1530_a3f`.
-- **All throwaway artifacts go to your session scratch folder**: `./tmp/<session-id>/` (or the project's existing convention). Never into `src/`, never into the root, never into another session's folder.
+- **Claim a session identity at task start.** Use the harness's session id and name when there is one; otherwise make up a short stamp once and reuse it all session: `2026-09-14_1530_a3f`.
+- **Throwaway artifacts go to `./tmp/<session-id>/`** — scratch scripts, experiment outputs, debug dumps. Never into `src/`, never into the root, never into another session's folder.
+- **Session deliverables go to `./sessions/<session-id>-<short-topic>/`** — the reports, exports, and documents this session was asked to produce, e.g. `sessions/2026-09-14_1530_a3f-psrwkv-review/`. These are *not* litter: the sweep never archives them, it lists the folder and lets the human decide.
+- **Editing existing project files stays in place** — working on the project's own code and docs is normal work. The folder rule covers new standalone files only.
 - **Snapshots carry the id too**: `-Backup/<session-id>/<original-relative-path>` — two sessions running in the same hour stay perfectly separable.
-- **At sweep time your folder is pre-classified**: it moves into `-Delete/<session-id>/` wholesale, no reference checks needed, and the manifest tags every entry with the session id so the human can see which window produced what — and empty one window's mess without touching another's.
+- **At sweep time** `./tmp/<session-id>/` moves into `-Delete/<session-id>/` wholesale, no reference checks needed, and the manifest tags every entry with the session id — one window's mess can be emptied without touching another's. `./sessions/...` folders are reported, never archived.
 
 Litter that never scattered — and never mixed across sessions — is the only kind this skill handles perfectly.
 
@@ -211,7 +213,7 @@ Read `MANIFEST.md`, copy back: `cp -r "./-Backup/2026-09-14_1530_a3f/src/config.
 
 ## What to return
 
-**End-of-task sweep (default).** A short table: archived to -Delete (count + notable names) · backed up to -Backup (count + what was snapshotted) · still running (processes you started + stop commands) · installed outside the project (packages + uninstall commands) · regenerable and safe to wipe (names + sizes) · needs manual deletion (paths, permission errors) · left alone (names + one-line why). Nothing else.
+**End-of-task sweep (default).** A short table: archived to -Delete (count + notable names) · session output folders (`./sessions/...` names + what's inside — never archived) · backed up to -Backup (count + what was snapshotted) · still running (processes you started + stop commands) · installed outside the project (packages + uninstall commands) · regenerable and safe to wipe (names + sizes) · needs manual deletion (paths, permission errors) · left alone (names + one-line why). Nothing else.
 
 **User asks for a restore.** The manifest lines matching their description, the exact copy commands, and a confirmation of what was restored.
 

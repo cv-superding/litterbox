@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/license-MIT-3fb950?style=flat-square" alt="license MIT">
   <img src="https://img.shields.io/badge/type-agent%20skill-2f81f7?style=flat-square" alt="type agent skill">
   <img src="https://img.shields.io/badge/core-one%20SKILL.md-f0883e?style=flat-square" alt="core: one SKILL.md">
-  <img src="https://img.shields.io/badge/version-1.5.0-a371f7?style=flat-square" alt="version 1.5.0">
+  <img src="https://img.shields.io/badge/version-1.6.0-a371f7?style=flat-square" alt="version 1.6.0">
   <img src="https://img.shields.io/badge/PRs-welcome-3fb950?style=flat-square" alt="PRs welcome">
 </p>
 
@@ -27,7 +27,7 @@ You know the scene: the agent finishes, and your project has grown `scratch_test
 Litterbox is a workspace-hygiene skill that gives the agent a fixed routine:
 
 1. **Move, never delete** — moving almost always works; deleting may not. All litter goes to **`-Delete/`** at the workspace root; you skim the manifest and empty it when satisfied.
-2. **Every session sweeps its own snow** — IDE running several agent windows over one project? Each session claims a session id at start, writes all throwaway files into its own `./tmp/<session-id>/`, and the sweep archives it wholesale into `-Delete/<session-id>/`. Windows never tangle, and the manifest tells you which window made what.
+2. **One folder per session** — IDE running several agent windows over one project? Each session claims a session id at start: throwaway files go to `./tmp/<session-id>/`, real deliverables (reports, docs, exports) go to `./sessions/<session-id>-topic>/`. The sweep archives litter by session and reports deliverable folders untouched — the project root stops being a jumble, and every window's output is one glance away.
 3. **Backup before overwrite** — any time the agent replaces an existing file, the original is snapshotted into **`-Backup/<timestamp>/<original-path>/`** first. Old versions are always recoverable.
 4. **Every move is logged** — each bucket has a `MANIFEST.md`: original path, destination, reason, and permission failures marked "needs manual deletion".
 5. **Packages stay in the project; runtimes ask first** — `.venv` / the project's `package.json` before installing any package. A missing runtime (Python, Node) triggers detect → conflict-check → your call: project-local (recommended) or global; a conflict forces project-local. Anything that does go global is ledgered with an uninstall command.
@@ -51,7 +51,7 @@ The leading dash keeps both folders **sorted above everything else** in your fil
 | Dev server or test container still running after the task | Sweep reports "still running" + stop commands; stops only when asked |
 | A half-failed move still lands in the manifest as success | Moves are verified before logging; buckets are always gitignored |
 | Open-sourcing pushes a key or cookie into history forever | Publish-boundary scan on the staged diff; `.env` always gitignored, examples ship `.env.example` placeholders |
-| Several IDE sessions over one project tangle their litter in the root | Per-session id and scratch folder; sweeps archive by session, never mixed |
+| Several IDE sessions over one project tangle their output files in the root | Per-session id and folders: litter to `tmp/` archived by session, deliverables kept per session and reported |
 | README and examples hardcode `F:\Code\...` paths nobody else has | Shareable files use relative paths or placeholders; absolute paths only in machine-local files |
 | `.venv` / `node_modules` archived or wiped carelessly | Regenerables are never archived: lockfile confirmed, sizes reported, you decide |
 | API keys inside debug dumps ride along into the bucket | Secrets scan before archiving; manifest marked `CONTAINS SECRETS` |

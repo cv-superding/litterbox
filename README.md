@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/license-MIT-3fb950?style=flat-square" alt="license MIT">
   <img src="https://img.shields.io/badge/type-agent%20skill-2f81f7?style=flat-square" alt="type agent skill">
   <img src="https://img.shields.io/badge/core-one%20SKILL.md-f0883e?style=flat-square" alt="core: one SKILL.md">
-  <img src="https://img.shields.io/badge/version-1.5.0-a371f7?style=flat-square" alt="version 1.5.0">
+  <img src="https://img.shields.io/badge/version-1.6.0-a371f7?style=flat-square" alt="version 1.6.0">
   <img src="https://img.shields.io/badge/PRs-welcome-3fb950?style=flat-square" alt="PRs welcome">
 </p>
 
@@ -27,7 +27,7 @@
 litterbox 是一个工作区卫生技能，教 agent 一套固定流程：
 
 1. **只搬不删** —— 移动几乎总有权限，删除未必。垃圾全部归拢到工作区根目录的 **`-Delete/`**，你扫一眼 manifest 再决定清空。
-2. **每个会话自扫门前雪** —— IDE 里同一项目开好几个会话窗口？每个会话开工先领一个 session id，临时文件全写进自己的 `./tmp/<session-id>/`，清扫时整目录搬进 `-Delete/<session-id>/`——不同窗口的垃圾永不混在一起，账本还能告诉你哪扇窗口拉了多少。
+2. **每个会话一个文件夹** —— IDE 里同一项目开好几个会话窗口？每个会话开工先领一个 session id：临时垃圾进 `./tmp/<session-id>/`，正式产出（报告、文档、导出件）进 `./sessions/<session-id>-主题>/`。扫尾时垃圾按会话归档、产出按会话留档并报告——项目根目录从此不再大杂烩，哪扇窗口产出了什么一目了然。
 3. **覆盖前先备份** —— 凡是要改写已有文件，先把原版快照进 **`-Backup/时间戳/原相对路径/`**，旧版本永远找得回来。
 4. **每次移动都记账** —— 两个桶里各有一份 `MANIFEST.md`：原路径、去向、原因、失败原因（权限不够的标记"需人工删除"）。
 5. **依赖只进项目环境，运行时先问你** —— 装包前先建 `.venv`/用项目 `package.json`；机器缺 Python/Node 这类运行时时，先检测已有版本和冲突，再让你二选一：项目内（推荐）还是全局——检测到冲突就只能项目内。全局装过的，账本里登记卸载命令。
@@ -51,7 +51,7 @@ litterbox 是一个工作区卫生技能，教 agent 一套固定流程：
 | 干完活 dev server、测试容器还挂在后台 | 收尾报告"仍在运行"+ 停止命令，你说停才停 |
 | move 一半失败，账本照样记"成功" | 移动后验证再写账本；桶永远 gitignore，不进仓库 |
 | 开源时 key/cookie 跟着 `git push` 进了历史 | 推送边界扫描暂存区；`.env` 永远 gitignore，示例用 `.env.example` 占位 |
-| 同一项目多个会话窗口，垃圾全混在项目根目录 | 每会话一个 id + 独立草稿目录，清扫按会话归档，互不掺和 |
+| 同一项目多个会话窗口，产出文件全混在项目根目录 | 会话 id + 独立文件夹：垃圾进 `tmp/` 按会话归档，正式产出按会话留档并报告 |
 | README/示例里写死 `F:\Code\...` 绝对路径，别人跑不起来 | 可对外文件一律相对路径或占位符；绝对路径只允许存在于机器本地文件 |
 | `.venv`/`node_modules` 被当垃圾乱搬乱删 | 可再生目录永不归档：确认 lockfile 存在、报大小、由你决定 |
 | debug dump 里的 API key 跟着垃圾进桶 | 归档前扫描密钥，账本标记 `CONTAINS SECRETS` |
