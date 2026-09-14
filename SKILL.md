@@ -10,12 +10,13 @@ description: |
   machine and keep shareable files free of absolute paths. Use when finishing
   any task that created scratch files, before committing or pushing, when the
   user mentions cleaning up, tidying, junk, temp files, a messy project,
-  environment pollution, global installs, open-sourcing, or venvs, or whenever
+  environment pollution, global installs, open-sourcing, multiple agent sessions
+  in one project, or venvs, or whenever
   you notice litter you created piling up — including leftover dev servers and
   processes you started — even if the user did not ask.
 license: MIT
 metadata:
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Litterbox: move, never delete
@@ -26,7 +27,7 @@ An agent's litter gets everywhere: scratch scripts, debug dumps, `output_final_v
 
 **`-Delete/` — litter.** Files the agent created during work that the final result does not reference: one-off test scripts, debug dumps, experiment outputs, duplicated attempts (`v2`, `final`, `final2`), placeholder files you never filled.
 
-**`-Backup/` — old versions.** A snapshot of any existing file *before* you overwrite or replace it: edited sources, replaced configs, superseded drafts. Keep the original relative path inside a timestamp directory: `-Backup/2026-09-13_1542/src/config.yaml`.
+**`-Backup/` — old versions.** A snapshot of any existing file *before* you overwrite or replace it: edited sources, replaced configs, superseded drafts. Keep the original relative path inside a session directory: `-Backup/2026-09-14_1530_a3f/src/config.yaml`.
 
 The leading dash sorts both folders above every normal folder, so the human sees them first. If the workspace root is read-only, fall back to the nearest writable ancestor directory or `~/.litterbox/<project-name>/` — and say where the buckets ended up in the report. If the user prefers different bucket names, follow their names.
 
@@ -36,11 +37,18 @@ The leading dash sorts both folders above every normal folder, so the human sees
 
 ## The backup habit
 
-Backups happen **at edit time, not cleanup time**. Before an Edit/Write replaces an existing file you did not create in this session, copy the original into `-Backup/<timestamp>/<original-relative-path>` first. Once you have overwritten it, the old version is gone — a cleanup pass cannot bring it back.
+Backups happen **at edit time, not cleanup time**. Before an Edit/Write replaces an existing file you did not create in this session, copy the original into `-Backup/<session-id>/<original-relative-path>` first. Once you have overwritten it, the old version is gone — a cleanup pass cannot bring it back.
 
-## Create litter in one place
+## Create litter in one place — per session
 
-The cheapest cleanup is the one that needs no archaeology. From the first minute of a task, put every throwaway artifact — scratch scripts, experiment outputs, debug dumps — into one scratch folder (`./tmp/`, or the project's existing convention), never into `src/` or the root. Files born in the scratch folder are pre-classified: at sweep time the whole folder is yours, so it moves into `-Delete/` wholesale with no reference checks. Litter that never scattered is the only kind this skill handles perfectly.
+The cheapest cleanup is the one that needs no archaeology. IDEs run several agent sessions over the same project, and their litter ends up tangled in one directory — nobody can tell which window made what. Prevent that at birth:
+
+- **Claim a session id at task start.** Use the harness's session id when there is one; otherwise make up a short stamp once and reuse it all session: `2026-09-14_1530_a3f`.
+- **All throwaway artifacts go to your session scratch folder**: `./tmp/<session-id>/` (or the project's existing convention). Never into `src/`, never into the root, never into another session's folder.
+- **Snapshots carry the id too**: `-Backup/<session-id>/<original-relative-path>` — two sessions running in the same hour stay perfectly separable.
+- **At sweep time your folder is pre-classified**: it moves into `-Delete/<session-id>/` wholesale, no reference checks needed, and the manifest tags every entry with the session id so the human can see which window produced what — and empty one window's mess without touching another's.
+
+Litter that never scattered — and never mixed across sessions — is the only kind this skill handles perfectly.
 
 ## Environments: install inside the project
 
@@ -99,7 +107,7 @@ The scan matters most at the **publish boundary** — the moment content leaves 
 4. **Move, verify, then manifest.** A move is complete only when the destination exists and the origin is gone — check both before writing anything. A directory move that dies halfway (permission errors, a locked file on Windows) must be finished or rolled back, never reported as done. Then remove parent directories the litter left empty — only ones created this session. Append one line per file to `MANIFEST.md` inside the bucket:
 
    ```markdown
-   ## 2026-09-13 15:42
+   ## 2026-09-14 15:42 · session 2026-09-14_1530_a3f
    - `scratch_test.py` → -Delete/ — one-off test script from session work
    - `output_v1.json`, `output_final.json` → -Delete/ — superseded experiment outputs
    - `src/config.yaml` → -Backup/2026-09-13_1542/ — original before override edit
@@ -112,7 +120,7 @@ The scan matters most at the **publish boundary** — the moment content leaves 
 
 Shell tip: a leading dash confuses argument parsing. Use `./`: `mv scratch_test.py ./-Delete/`.
 
-Another session is active in the same workspace? Sweep only your own session's litter and leave everything else — you cannot see the other agent's in-flight references.
+Another session is active in the same workspace? Each of you has a session id and a scratch folder — sweep only yours and leave everything else. You cannot see the other agent's in-flight references, and with per-session folders you should never have to.
 
 ## Keep the buckets out of git
 
@@ -195,9 +203,9 @@ Numbered strongest first. §1, §4, §6, and §7 justify stopping yourself on a 
 
 ## Restore
 
-Read `MANIFEST.md`, copy back: `cp -r "./-Backup/2026-09-13_1542/src/config.yaml" src/config.yaml`. For `-Delete/`, the manifest's original path is the destination.
+Read `MANIFEST.md`, copy back: `cp -r "./-Backup/2026-09-14_1530_a3f/src/config.yaml" src/config.yaml`. For `-Delete/`, the manifest's original path is the destination.
 
-**Check the destination first.** If the file has changed since the snapshot — newer edits, a newer backup, anything — snapshot the current version into `-Backup/<new-timestamp>/` before restoring, so a restore can never destroy newer work. Then verify what you restored: run it, open it, or diff it. Restore is a normal file operation — no special tooling, no lock-in.
+**Check the destination first.** If the file has changed since the snapshot — newer edits, a newer backup, anything — snapshot the current version into `-Backup/<your-session-id>-restored/` before restoring, so a restore can never destroy newer work. Then verify what you restored: run it, open it, or diff it. Restore is a normal file operation — no special tooling, no lock-in.
 
 **Backup aging.** If `-Backup/` holds many snapshots of the same file, or snapshots older than a month, say so in the sweep report and suggest pruning to the newest. The human decides; you never prune on your own.
 
